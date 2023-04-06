@@ -19,7 +19,7 @@
 
 	<properties>
 		<demo.port>8443</demo.port>
-		<start-class>org.kurento.tutorial.one2manycall.One2ManyCallApp</start-class>
+		<start-class>org.uit.streaming.UITStreaming.UITStreamingApp</start-class>
 	</properties>
 
 	<dependencies>
@@ -91,7 +91,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>org.kurento.tutorial.one2manycall.One2ManyCallApp</mainClass>
+							<mainClass>org.uit.streaming.UITStreaming.UITStreamingApp</mainClass>
 						</manifest>
 					</archive>
 				</configuration>

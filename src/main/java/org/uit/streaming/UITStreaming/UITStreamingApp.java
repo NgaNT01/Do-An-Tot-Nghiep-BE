@@ -15,7 +15,7 @@
  *
  */
 
-package org.kurento.tutorial.one2manycall;
+package org.uit.streaming.UITStreaming;
 
 import org.kurento.client.KurentoClient;
 import org.springframework.boot.SpringApplication;
@@ -34,7 +34,7 @@ import org.springframework.web.socket.server.standard.ServletServerContainerFact
  */
 @SpringBootApplication
 @EnableWebSocket
-public class One2ManyCallApp implements WebSocketConfigurer {
+public class UITStreamingApp implements WebSocketConfigurer {
 
   @Bean
   public CallHandler callHandler() {
@@ -59,7 +59,7 @@ public class One2ManyCallApp implements WebSocketConfigurer {
   }
 
   public static void main(String[] args) throws Exception {
-    SpringApplication.run(One2ManyCallApp.class, args);
+    SpringApplication.run(UITStreamingApp.class, args);
   }
 
 }
