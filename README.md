@@ -1,1 +1,0 @@
-UIT Streaming Website Using Kurento Media Server
