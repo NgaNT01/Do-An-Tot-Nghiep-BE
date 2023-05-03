@@ -13,6 +13,9 @@ public class SignupRequest {
     @Email
     private String email;
 
+    @Size(min = 3, max = 50)
+    private String avatarUrl;
+
     private Set<String> role;
 
     @NotBlank
@@ -41,6 +44,14 @@ public class SignupRequest {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 
     public Set<String> getRole() {

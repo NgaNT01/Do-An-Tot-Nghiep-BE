@@ -28,6 +28,9 @@ public class User {
     @Email
     private String email;
 
+    @Size(max = 50)
+    private String avatarUrl;
+
     @NotBlank
     @Size(max = 120)
     private String password;
@@ -38,13 +41,42 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
+    @OneToOne(mappedBy = "user")
+    private Room room;
+
     public User() {
     }
 
-    public User(String username, String email, String password) {
+    public User(String username, String email,String avatarUrl, String password) {
         this.username = username;
         this.email = email;
+        this.avatarUrl = avatarUrl;
         this.password = password;
+    }
+
+    public User(String username, String email, String avatarUrl, String password, Set<Role> roles, Room room) {
+        this.username = username;
+        this.email = email;
+        this.avatarUrl = avatarUrl;
+        this.password = password;
+        this.roles = roles;
+        this.room = room;
+    }
+
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
+    }
+
+    public Room getRoom() {
+        return room;
+    }
+
+    public void setRoom(Room room) {
+        this.room = room;
     }
 
     public Long getId() {
