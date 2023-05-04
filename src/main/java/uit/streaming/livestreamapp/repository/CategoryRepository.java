@@ -5,5 +5,7 @@ import org.springframework.stereotype.Repository;
 import uit.streaming.livestreamapp.entity.Category;
 
 @Repository
-public interface TagRepository extends JpaRepository<Category,Long> {
+public interface CategoryRepository extends JpaRepository<Category,Long> {
+    Category findCategoryByName(String name);
+
 }

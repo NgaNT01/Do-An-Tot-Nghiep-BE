@@ -19,10 +19,6 @@ public class CreateStreamRequest {
 
     @NotBlank
     @Size(max = 40)
-    private String streamType;
-
-    @NotBlank
-    @Size(max = 40)
     private String status;
 
     public String getStreamName() {
@@ -47,14 +43,6 @@ public class CreateStreamRequest {
 
     public void setCategories(Set<String> categories) {
         this.categories = categories;
-    }
-
-    public String getStreamType() {
-        return streamType;
-    }
-
-    public void setStreamType(String streamType) {
-        this.streamType = streamType;
     }
 
     public String getStatus() {

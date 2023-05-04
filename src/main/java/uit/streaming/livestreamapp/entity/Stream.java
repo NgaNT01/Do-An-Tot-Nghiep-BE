@@ -32,10 +32,19 @@ public class Stream {
     @OneToOne(mappedBy = "stream")
     private RecordVideo recordVideo;
 
-    @ManyToMany(mappedBy = "streams")
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "stream_category",
+            joinColumns = @JoinColumn(name = "category_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "stream_id", referencedColumnName = "id"))
     private Set<Category> categories;
 
     public Stream() {
+    }
+
+    public Stream(String streamName, String description, String status) {
+        this.streamName = streamName;
+        this.description = description;
+        this.status = status;
     }
 
     public Stream(String streamName, String description, User user, RecordVideo recordVideo, Set<Category> categories, String status) {

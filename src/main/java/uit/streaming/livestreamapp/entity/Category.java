@@ -3,6 +3,7 @@ package uit.streaming.livestreamapp.entity;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -20,20 +21,17 @@ public class Category {
     @NotBlank
     @Size(max = 20)
     private String description;
-
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "stream_category",
-            joinColumns = @JoinColumn(name = "category_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "stream_id", referencedColumnName = "id"))
-    private Set<Stream> streams;
-
+    
     public Category() {
     }
 
-    public Category(String name, String description, Set<Stream> streams) {
+    public Category(String name, String description) {
         this.name = name;
         this.description = description;
-        this.streams = streams;
+    }
+
+    public Category(String name) {
+        this.name = name;
     }
 
     public String getName() {
@@ -52,11 +50,4 @@ public class Category {
         this.description = description;
     }
 
-    public Set<Stream> getStreams() {
-        return streams;
-    }
-
-    public void setStreams(Set<Stream> streams) {
-        this.streams = streams;
-    }
 }
