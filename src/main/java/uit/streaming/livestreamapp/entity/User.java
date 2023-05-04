@@ -35,14 +35,16 @@ public class User {
     @Size(max = 120)
     private String password;
 
+    private Boolean isLive;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
-    @OneToOne(mappedBy = "user")
-    private Room room;
+    @OneToMany(mappedBy = "user")
+    private Set<Stream> streams;
 
     public User() {
     }
@@ -54,13 +56,30 @@ public class User {
         this.password = password;
     }
 
-    public User(String username, String email, String avatarUrl, String password, Set<Role> roles, Room room) {
+    public User(String username, String email, String avatarUrl, String password, Set<Role> roles, Set<Stream> streams, Boolean isLive) {
         this.username = username;
         this.email = email;
         this.avatarUrl = avatarUrl;
         this.password = password;
         this.roles = roles;
-        this.room = room;
+        this.streams = streams;
+        this.isLive = isLive;
+    }
+
+    public Boolean getLive() {
+        return isLive;
+    }
+
+    public void setLive(Boolean live) {
+        isLive = live;
+    }
+
+    public Set<Stream> getStreams() {
+        return streams;
+    }
+
+    public void setStreams(Set<Stream> streams) {
+        this.streams = streams;
     }
 
     public String getAvatarUrl() {
@@ -69,14 +88,6 @@ public class User {
 
     public void setAvatarUrl(String avatarUrl) {
         this.avatarUrl = avatarUrl;
-    }
-
-    public Room getRoom() {
-        return room;
-    }
-
-    public void setRoom(Room room) {
-        this.room = room;
     }
 
     public Long getId() {

@@ -6,8 +6,8 @@ import javax.validation.constraints.Size;
 import java.util.Set;
 
 @Entity
-@Table(name = "tags")
-public class Tag {
+@Table(name = "categories")
+public class Category {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,33 +15,33 @@ public class Tag {
 
     @NotBlank
     @Size(max = 20)
-    private String tagName;
+    private String name;
 
     @NotBlank
     @Size(max = 20)
     private String description;
 
     @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "stream_tag",
-            joinColumns = @JoinColumn(name = "tag_id", referencedColumnName = "id"),
+    @JoinTable(name = "stream_category",
+            joinColumns = @JoinColumn(name = "category_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "stream_id", referencedColumnName = "id"))
     private Set<Stream> streams;
 
-    public Tag() {
+    public Category() {
     }
 
-    public Tag(String tagName, String description, Set<Stream> streams) {
-        this.tagName = tagName;
+    public Category(String name, String description, Set<Stream> streams) {
+        this.name = name;
         this.description = description;
         this.streams = streams;
     }
 
-    public String getTagName() {
-        return tagName;
+    public String getName() {
+        return name;
     }
 
-    public void setTagName(String tagName) {
-        this.tagName = tagName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getDescription() {
