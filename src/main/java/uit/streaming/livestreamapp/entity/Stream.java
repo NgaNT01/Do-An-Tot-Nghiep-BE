@@ -3,6 +3,7 @@ package uit.streaming.livestreamapp.entity;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -33,10 +34,10 @@ public class Stream {
     private RecordVideo recordVideo;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "stream_category",
-            joinColumns = @JoinColumn(name = "category_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "stream_id", referencedColumnName = "id"))
-    private Set<Category> categories;
+    @JoinTable(name = "category_stream",
+            joinColumns = @JoinColumn(name = "stream_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id"))
+    private Set<Category> categories = new HashSet<>();
 
     public Stream() {
     }

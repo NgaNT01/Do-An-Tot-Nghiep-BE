@@ -50,9 +50,10 @@ public class StreamController {
     @Autowired
     UserDetailsServiceImpl userDetailsService;
 
+    @CrossOrigin(origins = "*")
     @PostMapping("/start")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<?> startNewLiveStream(@Valid @RequestHeader("Authorization") String jwt, @RequestBody CreateStreamRequest createStreamRequest) {
+    public ResponseEntity<?> startNewLiveStream(@RequestHeader("Authorization") String jwt, @RequestBody CreateStreamRequest createStreamRequest) {
         String[] parts = jwt.split(" ");
         String username = jwtUtils.getUserNameFromJwtToken(parts[1]);
         User user = userRepository.findByUsername(username);
