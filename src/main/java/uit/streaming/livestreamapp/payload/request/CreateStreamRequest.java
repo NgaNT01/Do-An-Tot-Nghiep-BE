@@ -12,7 +12,6 @@ public class CreateStreamRequest {
     private String streamName;
 
     @Size(max = 50)
-    @Email
     private String description;
 
     private Set<String> categories;

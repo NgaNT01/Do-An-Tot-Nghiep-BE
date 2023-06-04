@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import uit.streaming.livestreamapp.entity.Category;
+import uit.streaming.livestreamapp.payload.request.CreateCategoryRequest;
 import uit.streaming.livestreamapp.payload.response.MessageResponse;
 import uit.streaming.livestreamapp.repository.CategoryRepository;
 
@@ -26,8 +27,8 @@ public class CategoryController {
 
     @PostMapping("/add")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<?> addNewCategory(@Valid @RequestBody String name) {
-        Category category = new Category(name);
+    public ResponseEntity<?> addNewCategory(@RequestBody CreateCategoryRequest cateRequest) {
+        Category category = new Category(cateRequest.getName(), cateRequest.getDescription());
         categoryRepository.save(category);
 
         return ResponseEntity.ok(new MessageResponse("Successfully added new category."));

@@ -18,8 +18,8 @@ public class JwtUtils {
     @Value("${nga.app.jwtSecret}")
     private String jwtSecret;
 
-    @Value("${nga.app.jwtExpirationMs}")
-    private int jwtExpirationMs;
+//    @Value("${nga.app.jwtExpirationMs}")
+//    private int jwtExpirationMs;
 
     public String generateJwtToken(Authentication authentication) {
 
@@ -28,7 +28,7 @@ public class JwtUtils {
         return Jwts.builder()
                 .setSubject((userPrincipal.getUsername()))
                 .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+//                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
     }
