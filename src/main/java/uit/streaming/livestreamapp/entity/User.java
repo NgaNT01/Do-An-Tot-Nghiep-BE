@@ -1,6 +1,7 @@
 package uit.streaming.livestreamapp.entity;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.*;
@@ -46,6 +47,12 @@ public class User {
     @OneToMany(mappedBy = "user")
     private Set<Stream> streams;
 
+    @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL)
+    private Set<Follow> following;
+
+    @OneToMany(mappedBy = "following", cascade = CascadeType.ALL)
+    private Set<Follow> followers;
+
     public User() {
     }
 
@@ -64,6 +71,22 @@ public class User {
         this.roles = roles;
         this.streams = streams;
         this.isLive = isLive;
+    }
+
+    public Set<Follow> getFollowing() {
+        return following;
+    }
+
+    public void setFollowing(Set<Follow> following) {
+        this.following = following;
+    }
+
+    public Set<Follow> getFollowers() {
+        return followers;
+    }
+
+    public void setFollowers(Set<Follow> followers) {
+        this.followers = followers;
     }
 
     public Boolean getLive() {

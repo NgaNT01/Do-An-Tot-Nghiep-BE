@@ -11,13 +11,13 @@ public class CreateStreamRequest {
     @Size(min = 3, max = 50)
     private String streamName;
 
-    @Size(max = 50)
+    @Size(max = 500)
     private String description;
 
     private Set<String> categories;
 
     @NotBlank
-    @Size(max = 40)
+    @Size(max = 400)
     private String status;
 
     public String getStreamName() {

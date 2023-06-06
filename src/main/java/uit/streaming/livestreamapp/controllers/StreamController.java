@@ -58,36 +58,40 @@ public class StreamController {
 
     @PostMapping("/start")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<StreamResponse> startNewLiveStream(@RequestHeader("Authorization") String jwt, @RequestBody CreateStreamRequest createStreamRequest) {
+    public ResponseEntity<?> startNewLiveStream(@RequestHeader("Authorization") String jwt, @RequestBody CreateStreamRequest createStreamRequest) {
         String[] parts = jwt.split(" ");
         String username = jwtUtils.getUserNameFromJwtToken(parts[1]);
         User user = userRepository.findByUsername(username);
 
-        Stream stream = new Stream(createStreamRequest.getStreamName(),
-                createStreamRequest.getDescription(),
-                createStreamRequest.getStatus());
+        if (userRepository.numberOfBroadcastingStream(user.getId()) < 1) {
+            Stream stream = new Stream(createStreamRequest.getStreamName(),
+                    createStreamRequest.getDescription(),
+                    createStreamRequest.getStatus());
 
-        stream.setUser(user);
-        Set<String> strCategories = createStreamRequest.getCategories();
-        Set<Category> categories = new HashSet<>();
+            stream.setUser(user);
+            Set<String> strCategories = createStreamRequest.getCategories();
+            Set<Category> categories = new HashSet<>();
 
-        if (strCategories == null) {
-            Category category = categoryRepository.findCategoryByName("Games");
-            categories.add(category);
+            if (strCategories == null) {
+                Category category = categoryRepository.findCategoryByName("Games");
+                categories.add(category);
+            }
+            else {
+                strCategories.forEach(category -> {
+                    Category category1 = categoryRepository.findCategoryByName(category);
+                    categories.add(category1);
+                });
+            }
+
+            stream.setCategories(categories);
+            streamRepository.save(stream);
+            StreamResponse streamResponse = new StreamResponse(stream.getId(),stream.getStreamName(),stream.getDescription(),stream.getCategories(),stream.getStatus(),stream.getUser().getId());
+
+            return ResponseEntity.ok(streamResponse);
         }
         else {
-            strCategories.forEach(category -> {
-                Category category1 = categoryRepository.findCategoryByName(category);
-                categories.add(category1);
-            });
+            return ResponseEntity.ok(new MessageResponse("Error"));
         }
-
-        stream.setCategories(categories);
-        streamRepository.save(stream);
-
-        StreamResponse streamResponse = new StreamResponse(stream.getId(),stream.getStreamName(),stream.getDescription(),stream.getCategories(),stream.getStatus(),stream.getUser().getId());
-
-        return ResponseEntity.ok(streamResponse);
     }
 
     @PostMapping("/stop")
@@ -112,6 +116,16 @@ public class StreamController {
             listBroadcastingStreams.add(streamResponse);
         }
         return ResponseEntity.ok(listBroadcastingStreams);
+    }
+
+    @GetMapping("/stream-by-username/{username}")
+    public ResponseEntity<StreamResponse> getStreamByUserName(@PathVariable String username) {
+        Stream stream = streamRepository.findStreamByUserName(username);
+
+        StreamResponse streamResponse = new StreamResponse(stream.getId(),stream.getStreamName(),stream.getDescription()
+                ,stream.getCategories(),stream.getStatus(),stream.getUser().getId());
+
+        return ResponseEntity.ok(streamResponse);
     }
 
 }

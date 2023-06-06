@@ -15,15 +15,15 @@ public class Stream {
     private Long id;
 
     @NotBlank
-    @Size(max = 20)
+    @Size(max = 200)
     private String streamName;
 
     @NotBlank
-    @Size(max = 50)
+    @Size(max = 500)
     private String description;
 
     @NotBlank
-    @Size(max = 20)
+    @Size(max = 200)
     private String status;
 
     @ManyToOne(cascade = CascadeType.ALL)

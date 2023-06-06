@@ -23,4 +23,8 @@ public interface StreamRepository extends JpaRepository<Stream, Long> {
     @Query(value = "SELECT s FROM Stream s WHERE s.status = 'broadcasting'")
     public List<Stream> getListBroadcastingStreams();
 
+    @Query(value = "SELECT s.* FROM STREAM s inner join users u " +
+            "on s.user_id = u.id where s.status = 'broadcasting' and u.username = ?1",nativeQuery = true)
+    Stream findStreamByUserName(String username);
+
 }

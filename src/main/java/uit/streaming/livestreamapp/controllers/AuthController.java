@@ -2,6 +2,7 @@ package uit.streaming.livestreamapp.controllers;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -11,6 +12,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,12 +30,13 @@ import uit.streaming.livestreamapp.payload.request.LoginRequest;
 import uit.streaming.livestreamapp.payload.request.SignupRequest;
 import uit.streaming.livestreamapp.payload.response.JwtResponse;
 import uit.streaming.livestreamapp.payload.response.MessageResponse;
+import uit.streaming.livestreamapp.payload.response.UserProfileResponse;
 import uit.streaming.livestreamapp.repository.RoleRepository;
 import uit.streaming.livestreamapp.repository.UserRepository;
 import uit.streaming.livestreamapp.security.jwt.JwtUtils;
 import uit.streaming.livestreamapp.services.UserDetailsImpl;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -154,5 +157,25 @@ public class AuthController {
         userRepository.save(user);
 
         return ResponseEntity.ok("Upload avatar successfully");
+    }
+
+    @GetMapping("/user-profile/{userId}")
+    public ResponseEntity<UserProfileResponse> getUserProfileById(@PathVariable Long userId) {
+        Optional<User> user = userRepository.findById(userId);
+
+        UserProfileResponse userProfileResponse = new UserProfileResponse(user.get().getId(),user.get().getUsername(),user.get().getEmail(),
+                user.get().getAvatarUrl(),user.get().getLive(),user.get().getRoles(),user.get().getStreams());
+
+        return ResponseEntity.ok(userProfileResponse);
+    }
+
+    @GetMapping("/user-by-name/{username}")
+    public ResponseEntity<UserProfileResponse> getUserProfileByName(@PathVariable String username) {
+        User user = userRepository.findByUsername(username);
+
+        UserProfileResponse userProfileResponse = new UserProfileResponse(user.getId(),user.getUsername(),user.getEmail(),
+                user.getAvatarUrl(),user.getLive(),user.getRoles(),user.getStreams());
+
+        return ResponseEntity.ok(userProfileResponse);
     }
 }

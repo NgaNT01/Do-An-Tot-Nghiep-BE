@@ -14,16 +14,16 @@ public class StreamResponse {
     private Long streamId;
 
     @NotBlank
-    @Size(min = 3, max = 50)
+    @Size(min = 3, max = 500)
     private String streamName;
 
-    @Size(max = 50)
+    @Size(max = 500)
     private String description;
 
     private Set<Category> categories;
 
     @NotBlank
-    @Size(max = 40)
+    @Size(max = 400)
     private String status;
 
     private Long userId;

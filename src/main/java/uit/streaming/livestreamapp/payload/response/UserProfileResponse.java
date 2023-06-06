@@ -1,6 +1,9 @@
 package uit.streaming.livestreamapp.payload.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import uit.streaming.livestreamapp.entity.Category;
+import uit.streaming.livestreamapp.entity.Role;
+import uit.streaming.livestreamapp.entity.Stream;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -11,38 +14,33 @@ public class UserProfileResponse {
 
     @NotBlank
     @Size(min = 3, max = 50)
-    private Long streamId;
+    private Long userId;
 
     @NotBlank
     @Size(min = 3, max = 50)
-    private String streamName;
+    private String username;
 
     @Size(max = 50)
-    private String description;
+    private String email;
 
-    private Set<Category> categories;
+    @Size(max = 500)
+    private String avatarUrl;
 
-    @NotBlank
-    @Size(max = 40)
-    private String status;
+    private Boolean isLive;
 
-    private Long userId;
+    private Set<Role> roles;
 
-    public UserProfileResponse(Long streamId, String streamName, String description, Set<Category> categories, String status, Long userId) {
-        this.streamId = streamId;
-        this.streamName = streamName;
-        this.description = description;
-        this.categories = categories;
-        this.status = status;
+    @JsonIgnore
+    private Set<Stream> streams;
+
+    public UserProfileResponse(Long userId, String username, String email, String avatarUrl, Boolean isLive, Set<Role> roles, Set<Stream> streams) {
         this.userId = userId;
-    }
-
-    public Long getStreamId() {
-        return streamId;
-    }
-
-    public void setStreamId(Long streamId) {
-        this.streamId = streamId;
+        this.username = username;
+        this.email = email;
+        this.avatarUrl = avatarUrl;
+        this.isLive = isLive;
+        this.roles = roles;
+        this.streams = streams;
     }
 
     public Long getUserId() {
@@ -53,35 +51,51 @@ public class UserProfileResponse {
         this.userId = userId;
     }
 
-    public String getStreamName() {
-        return streamName;
+    public String getUsername() {
+        return username;
     }
 
-    public void setStreamName(String streamName) {
-        this.streamName = streamName;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
-    public String getDescription() {
-        return description;
+    public String getEmail() {
+        return email;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
-    public Set<Category> getCategories() {
-        return categories;
+    public String getAvatarUrl() {
+        return avatarUrl;
     }
 
-    public void setCategories(Set<Category> categories) {
-        this.categories = categories;
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 
-    public String getStatus() {
-        return status;
+    public Boolean getLive() {
+        return isLive;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setLive(Boolean live) {
+        isLive = live;
+    }
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
+    }
+
+    public Set<Stream> getStreams() {
+        return streams;
+    }
+
+    public void setStreams(Set<Stream> streams) {
+        this.streams = streams;
     }
 }
