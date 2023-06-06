@@ -3,6 +3,7 @@ package uit.streaming.livestreamapp.entity;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,6 +27,10 @@ public class Stream {
     @Size(max = 200)
     private String status;
 
+    private LocalDateTime startTime;
+
+    private LocalDateTime endTime;
+
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
@@ -42,10 +47,11 @@ public class Stream {
     public Stream() {
     }
 
-    public Stream(String streamName, String description, String status) {
+    public Stream(String streamName, String description, String status, LocalDateTime startTime) {
         this.streamName = streamName;
         this.description = description;
         this.status = status;
+        this.startTime = startTime;
     }
 
     public Stream(String streamName, String description, User user, RecordVideo recordVideo, Set<Category> categories, String status) {

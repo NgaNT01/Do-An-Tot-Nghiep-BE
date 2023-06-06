@@ -24,6 +24,7 @@ import uit.streaming.livestreamapp.services.UserDetailsImpl;
 import uit.streaming.livestreamapp.services.UserDetailsServiceImpl;
 
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @RestController
@@ -64,9 +65,12 @@ public class StreamController {
         User user = userRepository.findByUsername(username);
 
         if (userRepository.numberOfBroadcastingStream(user.getId()) < 1) {
+            LocalDateTime startTime = LocalDateTime.now();
+
+
             Stream stream = new Stream(createStreamRequest.getStreamName(),
                     createStreamRequest.getDescription(),
-                    createStreamRequest.getStatus());
+                    createStreamRequest.getStatus(),startTime);
 
             stream.setUser(user);
             Set<String> strCategories = createStreamRequest.getCategories();

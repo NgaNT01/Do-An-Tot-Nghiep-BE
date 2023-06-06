@@ -22,11 +22,9 @@ public class RecordVideo {
     private String recordName;
 
     @NotBlank
-    @Size(max = 20)
     private LocalDateTime startTime;
 
     @NotBlank
-    @Size(max = 20)
     private LocalDateTime endTime;
 
     @OneToOne(cascade = CascadeType.ALL)
