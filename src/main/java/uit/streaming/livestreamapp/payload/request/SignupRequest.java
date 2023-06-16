@@ -13,7 +13,7 @@ public class SignupRequest {
     @Email
     private String email;
 
-    @Size(min = 3, max = 50)
+    @Size(min = 3, max = 500)
     private String avatarUrl;
 
     private Set<String> role;

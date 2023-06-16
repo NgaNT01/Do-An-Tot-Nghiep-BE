@@ -7,6 +7,8 @@ import uit.streaming.livestreamapp.payload.response.StreamResponse;
 import uit.streaming.livestreamapp.repository.StreamRepository;
 
 import javax.transaction.Transactional;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -19,13 +21,39 @@ public class StreamService {
 
 
     @Transactional
-    public void stopStreamById(Long streamId) {
-        streamRepository.stopStreamById(streamId);
+    public void stopStreamById(Long streamId, LocalDateTime endTime) {
+        streamRepository.stopStreamById(endTime,streamId);
     }
 
     public List<Stream> getListBroadcastingStreams() {
         List<Stream> streams = streamRepository.getListBroadcastingStreams();
         return streams;
+    }
+
+    public int calculateTotalViewsByMonthAndYearandUserId(int month, int year, Long userId) {
+        List<Stream> streams = streamRepository.findByMonthAndYearAndUserId(month, year,userId);
+
+        int totalViews = 0;
+        for (Stream stream : streams) {
+            totalViews += stream.getViewerCount();
+        }
+
+        return totalViews;
+    }
+
+    public Duration calculateTotalDurationByMonthAndYearAndUserId(int month, int year, Long userId) {
+        List<Stream> streams = streamRepository.findByMonthAndYearAndUserId(month, year, userId);
+
+        Duration totalDuration = Duration.ZERO;
+        for (Stream stream : streams) {
+            Duration livestreamDuration = Duration.between(stream.getStartTime(), stream.getEndTime());
+            System.out.println(livestreamDuration);
+            totalDuration = totalDuration.plus(livestreamDuration);
+        }
+
+        System.out.println("total" + totalDuration);
+
+        return totalDuration;
     }
 
 }

@@ -29,7 +29,7 @@ public class User {
     @Email
     private String email;
 
-    @Size(max = 50)
+    @Size(max = 500)
     private String avatarUrl;
 
     @NotBlank

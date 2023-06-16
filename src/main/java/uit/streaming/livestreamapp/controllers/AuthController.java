@@ -72,11 +72,14 @@ public class AuthController {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok(new JwtResponse(jwt,
+        JwtResponse jwtResponse = new JwtResponse(jwt,
                 userDetails.getId(),
                 userDetails.getUsername(),
                 userDetails.getEmail(),
-                roles));
+                userDetails.getAvatar_url(),
+                roles);
+
+        return ResponseEntity.ok(jwtResponse);
     }
 
     @PostMapping("/sign-up")

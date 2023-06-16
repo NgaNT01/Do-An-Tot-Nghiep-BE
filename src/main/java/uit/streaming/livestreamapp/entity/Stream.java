@@ -27,6 +27,14 @@ public class Stream {
     @Size(max = 200)
     private String status;
 
+    private Boolean isPublic;
+
+    private String accessCode;
+
+    private int viewerCount;
+
+    private String thumbnail;
+
     private LocalDateTime startTime;
 
     private LocalDateTime endTime;
@@ -54,6 +62,24 @@ public class Stream {
         this.startTime = startTime;
     }
 
+    public Stream(String streamName, String description, String status, String thumbnail, LocalDateTime startTime) {
+        this.streamName = streamName;
+        this.description = description;
+        this.status = status;
+        this.thumbnail = thumbnail;
+        this.startTime = startTime;
+    }
+
+    public Stream(String streamName, String description, String status, String accessCode, int viewerCount, String thumbnail, LocalDateTime startTime) {
+        this.streamName = streamName;
+        this.description = description;
+        this.status = status;
+        this.accessCode = accessCode;
+        this.viewerCount = viewerCount;
+        this.thumbnail = thumbnail;
+        this.startTime = startTime;
+    }
+
     public Stream(String streamName, String description, User user, RecordVideo recordVideo, Set<Category> categories, String status) {
         this.streamName = streamName;
         this.description = description;
@@ -62,6 +88,55 @@ public class Stream {
         this.categories = categories;
         this.status = status;
     }
+
+    public Boolean getPublic() {
+        return isPublic;
+    }
+
+    public void setPublic(Boolean aPublic) {
+        isPublic = aPublic;
+    }
+
+    public int getViewerCount() {
+        return viewerCount;
+    }
+
+    public void setViewerCount(int viewerCount) {
+        this.viewerCount = viewerCount;
+    }
+
+    public String getAccessCode() {
+        return accessCode;
+    }
+
+    public void setAccessCode(String accessCode) {
+        this.accessCode = accessCode;
+    }
+
+    public String getThumbnail() {
+        return thumbnail;
+    }
+
+    public void setThumbnail(String thumbnail) {
+        this.thumbnail = thumbnail;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
     public User getUser() {
         return user;
     }

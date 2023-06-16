@@ -16,6 +16,8 @@ public class CreateStreamRequest {
 
     private Set<String> categories;
 
+    private String accessCode;
+
     @NotBlank
     @Size(max = 400)
     private String status;
@@ -26,6 +28,14 @@ public class CreateStreamRequest {
 
     public void setStreamName(String streamName) {
         this.streamName = streamName;
+    }
+
+    public String getAccessCode() {
+        return accessCode;
+    }
+
+    public void setAccessCode(String accessCode) {
+        this.accessCode = accessCode;
     }
 
     public String getDescription() {

@@ -11,8 +11,10 @@ import uit.streaming.livestreamapp.entity.Category;
 import uit.streaming.livestreamapp.entity.Stream;
 import uit.streaming.livestreamapp.entity.User;
 import uit.streaming.livestreamapp.payload.request.CreateStreamRequest;
+import uit.streaming.livestreamapp.payload.request.GetStatisticRequest;
 import uit.streaming.livestreamapp.payload.request.StopStreamRequest;
 import uit.streaming.livestreamapp.payload.response.MessageResponse;
+import uit.streaming.livestreamapp.payload.response.StatisticResponse;
 import uit.streaming.livestreamapp.payload.response.StreamResponse;
 import uit.streaming.livestreamapp.repository.CategoryRepository;
 import uit.streaming.livestreamapp.repository.RoleRepository;
@@ -24,6 +26,7 @@ import uit.streaming.livestreamapp.services.UserDetailsImpl;
 import uit.streaming.livestreamapp.services.UserDetailsServiceImpl;
 
 import javax.validation.Valid;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -67,10 +70,19 @@ public class StreamController {
         if (userRepository.numberOfBroadcastingStream(user.getId()) < 1) {
             LocalDateTime startTime = LocalDateTime.now();
 
-
             Stream stream = new Stream(createStreamRequest.getStreamName(),
                     createStreamRequest.getDescription(),
                     createStreamRequest.getStatus(),startTime);
+
+            if (createStreamRequest.getAccessCode() != null) {
+                stream.setPublic(false);
+                stream.setAccessCode(createStreamRequest.getAccessCode());
+            }
+            else {
+                stream.setPublic(true);
+            }
+
+            stream.setViewerCount(0);
 
             stream.setUser(user);
             Set<String> strCategories = createStreamRequest.getCategories();
@@ -88,8 +100,9 @@ public class StreamController {
             }
 
             stream.setCategories(categories);
+
             streamRepository.save(stream);
-            StreamResponse streamResponse = new StreamResponse(stream.getId(),stream.getStreamName(),stream.getDescription(),stream.getCategories(),stream.getStatus(),stream.getUser().getId());
+            StreamResponse streamResponse = new StreamResponse(stream.getId(),stream.getStreamName(),stream.getDescription(),stream.getCategories(),stream.getStartTime(),stream.getStatus(),stream.getUser().getId());
 
             return ResponseEntity.ok(streamResponse);
         }
@@ -101,16 +114,28 @@ public class StreamController {
     @PostMapping("/stop")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<StreamResponse> stopLiveStream(@RequestBody StopStreamRequest stopStreamRequest) {
-        streamService.stopStreamById(stopStreamRequest.getStreamId());
+        LocalDateTime endTime = LocalDateTime.now();
+        streamService.stopStreamById(stopStreamRequest.getStreamId(),endTime);
 
         Optional<Stream> stream = streamRepository.findById(stopStreamRequest.getStreamId());
 
         StreamResponse streamResponse = new StreamResponse(stream.get().getId(),stream.get().getStreamName(),stream.get().getDescription(),
-                stream.get().getCategories(),stream.get().getStatus(),stream.get().getUser().getId());
+                stream.get().getCategories(),stream.get().getStartTime(),stream.get().getEndTime(),stream.get().getStatus(),stream.get().getUser().getId());
 
         return ResponseEntity.ok(streamResponse);
     }
-    
+
+    @PostMapping("/statistic")
+    public ResponseEntity<?> getStatisticInfo(@RequestBody GetStatisticRequest getStatisticRequest) {
+        int totalViews = streamService.calculateTotalViewsByMonthAndYearandUserId(getStatisticRequest.getMonth(), getStatisticRequest.getYear(), getStatisticRequest.getUserId());
+        Long totalDurations = streamService.calculateTotalDurationByMonthAndYearAndUserId(getStatisticRequest.getMonth(), getStatisticRequest.getYear(), getStatisticRequest.getUserId()).toSeconds();
+
+        StatisticResponse statisticResponse = new StatisticResponse(totalViews,totalDurations);
+
+        return ResponseEntity.ok(statisticResponse);
+    }
+
+
     @GetMapping("/broadcasting-stream")
     public ResponseEntity<List<StreamResponse>> getListBroadcastingStream() {
         List<StreamResponse> listBroadcastingStreams = new ArrayList<>();
@@ -130,6 +155,17 @@ public class StreamController {
                 ,stream.getCategories(),stream.getStatus(),stream.getUser().getId());
 
         return ResponseEntity.ok(streamResponse);
+    }
+
+    @GetMapping("/stream-by-category/{category}")
+    public ResponseEntity<List<StreamResponse>> getListBroadcastingStreamsByCategory(@PathVariable String category) {
+        List<StreamResponse> listBroadcastingStreamsByCategory = new ArrayList<>();
+        for (Stream stream : streamRepository.getListBroadcastingStreamsByCategory(category)) {
+            StreamResponse streamResponse = new StreamResponse(stream.getId(),stream.getStreamName(),stream.getDescription(),
+                    stream.getCategories(),stream.getStatus(),stream.getUser().getId());
+            listBroadcastingStreamsByCategory.add(streamResponse);
+        }
+        return ResponseEntity.ok(listBroadcastingStreamsByCategory);
     }
 
 }

@@ -5,6 +5,7 @@ import uit.streaming.livestreamapp.entity.Category;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 public class StreamResponse {
@@ -22,6 +23,10 @@ public class StreamResponse {
 
     private Set<Category> categories;
 
+    private LocalDateTime startTime;
+
+    private LocalDateTime endTime;
+
     @NotBlank
     @Size(max = 400)
     private String status;
@@ -33,6 +38,27 @@ public class StreamResponse {
         this.streamName = streamName;
         this.description = description;
         this.categories = categories;
+        this.status = status;
+        this.userId = userId;
+    }
+
+    public StreamResponse(Long streamId, String streamName, String description, Set<Category> categories, LocalDateTime startTime, String status, Long userId) {
+        this.streamId = streamId;
+        this.streamName = streamName;
+        this.description = description;
+        this.categories = categories;
+        this.startTime = startTime;
+        this.status = status;
+        this.userId = userId;
+    }
+
+    public StreamResponse(Long streamId, String streamName, String description, Set<Category> categories, LocalDateTime startTime, LocalDateTime endTime, String status, Long userId) {
+        this.streamId = streamId;
+        this.streamName = streamName;
+        this.description = description;
+        this.categories = categories;
+        this.startTime = startTime;
+        this.endTime = endTime;
         this.status = status;
         this.userId = userId;
     }

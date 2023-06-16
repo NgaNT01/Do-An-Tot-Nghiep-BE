@@ -7,6 +7,7 @@ public class JwtResponse {
     private Long id;
     private String username;
     private String email;
+    private String avatar_url;
     private final List<String> roles;
 
     public JwtResponse(String accessToken, Long id, String username, String email, List<String> roles) {
@@ -17,8 +18,21 @@ public class JwtResponse {
         this.roles = roles;
     }
 
+    public JwtResponse(String token, Long id, String username, String email, String avatar_url, List<String> roles) {
+        this.token = token;
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        this.avatar_url = avatar_url;
+        this.roles = roles;
+    }
+
     public String getAccessToken() {
         return token;
+    }
+
+    public String getAvatar_url() {
+        return avatar_url;
     }
 
     public void setAccessToken(String accessToken) {
