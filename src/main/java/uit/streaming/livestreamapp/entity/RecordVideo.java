@@ -14,17 +14,15 @@ public class RecordVideo {
     private Long id;
 
     @NotBlank
-    @Size(max = 20)
+    @Size(max = 200)
     private String recordUrl;
 
     @NotBlank
-    @Size(max = 20)
+    @Size(max = 200)
     private String recordName;
 
-    @NotBlank
     private LocalDateTime startTime;
 
-    @NotBlank
     private LocalDateTime endTime;
 
     @OneToOne(cascade = CascadeType.ALL)
@@ -32,6 +30,19 @@ public class RecordVideo {
     private Stream stream;
 
     public RecordVideo() {
+    }
+
+    public RecordVideo(String recordUrl, String recordName, LocalDateTime startTime) {
+        this.recordUrl = recordUrl;
+        this.recordName = recordName;
+        this.startTime = startTime;
+    }
+
+    public RecordVideo(String recordUrl, String recordName, LocalDateTime startTime, LocalDateTime endTime) {
+        this.recordUrl = recordUrl;
+        this.recordName = recordName;
+        this.startTime = startTime;
+        this.endTime = endTime;
     }
 
     public RecordVideo(String recordUrl, String recordName, LocalDateTime startTime, LocalDateTime endTime, Stream stream) {

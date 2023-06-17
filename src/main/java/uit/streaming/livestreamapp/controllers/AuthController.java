@@ -150,7 +150,7 @@ public class AuthController {
         String key = "avatar/" + userId + "/" + fileName;
 
         PutObjectRequest putObjectRequest = new PutObjectRequest("ngant01", key, file.getInputStream(), metadata)
-                .withCannedAcl(CannedAccessControlList.PublicRead);
+                .withCannedAcl(CannedAccessControlList.PublicReadWrite);
 
         amazonS3.putObject(putObjectRequest);
 

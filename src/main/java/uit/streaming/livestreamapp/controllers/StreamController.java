@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import uit.streaming.livestreamapp.entity.Category;
+import uit.streaming.livestreamapp.entity.RecordVideo;
 import uit.streaming.livestreamapp.entity.Stream;
 import uit.streaming.livestreamapp.entity.User;
 import uit.streaming.livestreamapp.payload.request.CreateStreamRequest;
@@ -16,10 +17,7 @@ import uit.streaming.livestreamapp.payload.request.StopStreamRequest;
 import uit.streaming.livestreamapp.payload.response.MessageResponse;
 import uit.streaming.livestreamapp.payload.response.StatisticResponse;
 import uit.streaming.livestreamapp.payload.response.StreamResponse;
-import uit.streaming.livestreamapp.repository.CategoryRepository;
-import uit.streaming.livestreamapp.repository.RoleRepository;
-import uit.streaming.livestreamapp.repository.StreamRepository;
-import uit.streaming.livestreamapp.repository.UserRepository;
+import uit.streaming.livestreamapp.repository.*;
 import uit.streaming.livestreamapp.security.jwt.JwtUtils;
 import uit.streaming.livestreamapp.services.StreamService;
 import uit.streaming.livestreamapp.services.UserDetailsImpl;
@@ -46,6 +44,9 @@ public class StreamController {
 
     @Autowired
     StreamRepository streamRepository;
+
+    @Autowired
+    RecordVideoRepository recordVideoRepository;
 
     @Autowired
     PasswordEncoder encoder;
@@ -102,6 +103,13 @@ public class StreamController {
             stream.setCategories(categories);
 
             streamRepository.save(stream);
+            String recordUrl = "https://ngant01.sgp1.digitaloceanspaces.com/streams/" + username + "_" + stream.getId().toString() +
+                    ".mp4";
+
+            RecordVideo recordVideo = new RecordVideo(recordUrl,stream.getStreamName(),startTime);
+
+            recordVideo.setStream(stream);
+            recordVideoRepository.save(recordVideo);
             StreamResponse streamResponse = new StreamResponse(stream.getId(),stream.getStreamName(),stream.getDescription(),stream.getCategories(),stream.getStartTime(),stream.getStatus(),stream.getUser().getId());
 
             return ResponseEntity.ok(streamResponse);
@@ -126,6 +134,7 @@ public class StreamController {
     }
 
     @PostMapping("/statistic")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> getStatisticInfo(@RequestBody GetStatisticRequest getStatisticRequest) {
         int totalViews = streamService.calculateTotalViewsByMonthAndYearandUserId(getStatisticRequest.getMonth(), getStatisticRequest.getYear(), getStatisticRequest.getUserId());
         Long totalDurations = streamService.calculateTotalDurationByMonthAndYearAndUserId(getStatisticRequest.getMonth(), getStatisticRequest.getYear(), getStatisticRequest.getUserId()).toSeconds();
@@ -166,6 +175,18 @@ public class StreamController {
             listBroadcastingStreamsByCategory.add(streamResponse);
         }
         return ResponseEntity.ok(listBroadcastingStreamsByCategory);
+    }
+
+    @GetMapping("/get-all-stream")
+    public ResponseEntity<?> getAllStream() {
+        List<Stream> streams = streamRepository.getListStream();
+        List<StreamResponse> streamResponses = new ArrayList<>();
+        for (Stream stream : streams) {
+            StreamResponse streamResponse = new StreamResponse(stream.getId(),stream.getStreamName(),stream.getDescription(),
+                    stream.getCategories(),stream.getStatus(),stream.getUser().getId());
+            streamResponses.add(streamResponse);
+        }
+        return ResponseEntity.ok(streamResponses);
     }
 
 }

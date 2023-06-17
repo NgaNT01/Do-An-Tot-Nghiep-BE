@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uit.streaming.livestreamapp.entity.Stream;
 import uit.streaming.livestreamapp.payload.response.StreamResponse;
+import uit.streaming.livestreamapp.repository.RecordVideoRepository;
 import uit.streaming.livestreamapp.repository.StreamRepository;
 
 import javax.transaction.Transactional;
@@ -19,10 +20,14 @@ public class StreamService {
     @Autowired
     StreamRepository streamRepository;
 
+    @Autowired
+    RecordVideoRepository recordVideoRepository;
+
 
     @Transactional
     public void stopStreamById(Long streamId, LocalDateTime endTime) {
         streamRepository.stopStreamById(endTime,streamId);
+        recordVideoRepository.updateEndTimeRecordVideo(endTime, streamId);
     }
 
     public List<Stream> getListBroadcastingStreams() {
