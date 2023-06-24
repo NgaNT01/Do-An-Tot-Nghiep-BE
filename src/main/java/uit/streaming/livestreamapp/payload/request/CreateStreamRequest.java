@@ -18,9 +18,29 @@ public class CreateStreamRequest {
 
     private String accessCode;
 
+    private String stringThumbnail;
+
+    private String fileName;
+
     @NotBlank
     @Size(max = 400)
     private String status;
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getStringThumbnail() {
+        return stringThumbnail;
+    }
+
+    public void setStringThumbnail(String stringThumbnail) {
+        this.stringThumbnail = stringThumbnail;
+    }
 
     public String getStreamName() {
         return streamName;

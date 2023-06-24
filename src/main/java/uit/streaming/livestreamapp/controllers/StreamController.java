@@ -1,5 +1,15 @@
 package uit.streaming.livestreamapp.controllers;
 
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.AWSCredentialsProvider;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.client.builder.AwsClientBuilder;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -7,6 +17,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import uit.streaming.livestreamapp.entity.Category;
 import uit.streaming.livestreamapp.entity.RecordVideo;
 import uit.streaming.livestreamapp.entity.Stream;
@@ -24,6 +35,8 @@ import uit.streaming.livestreamapp.services.UserDetailsImpl;
 import uit.streaming.livestreamapp.services.UserDetailsServiceImpl;
 
 import javax.validation.Valid;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -60,6 +73,9 @@ public class StreamController {
     @Autowired
     StreamService streamService;
 
+    @Autowired
+    AmazonS3 amazonS3;
+
 
     @PostMapping("/start")
     @PreAuthorize("hasRole('USER')")
@@ -67,6 +83,28 @@ public class StreamController {
         String[] parts = jwt.split(" ");
         String username = jwtUtils.getUserNameFromJwtToken(parts[1]);
         User user = userRepository.findByUsername(username);
+
+        AWSCredentials credentials = new BasicAWSCredentials(
+                "DO008KGCFHTVD8L9HY42",
+                "hxmW4xJ8ZW37xPyTh8oloawj7q7dtGU7bD+nMiCiR8g"
+        );
+
+        AmazonS3 s3client = AmazonS3ClientBuilder
+                .standard()
+                .withCredentials(new AWSStaticCredentialsProvider(credentials))
+                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration("sgp1.digitaloceanspaces.com", "sgp1"))
+                .build();
+
+        byte[] byteimage = Base64.getDecoder().decode(createStreamRequest.getStringThumbnail());
+        InputStream is = new ByteArrayInputStream(byteimage);
+        ObjectMetadata om = new ObjectMetadata();
+        om.setContentLength(byteimage.length);
+        om.setContentType("image/jpg");
+
+        String filepath = "stream_profile/" + createStreamRequest.getFileName();
+        s3client.putObject(
+                new PutObjectRequest("ngant01", filepath, is, om)
+                        .withCannedAcl(CannedAccessControlList.PublicReadWrite));
 
         if (userRepository.numberOfBroadcastingStream(user.getId()) < 1) {
             LocalDateTime startTime = LocalDateTime.now();
@@ -82,6 +120,8 @@ public class StreamController {
             else {
                 stream.setPublic(true);
             }
+
+            stream.setThumbnail(s3client.getUrl("ngant01",filepath).toString());
 
             stream.setViewerCount(0);
 
@@ -110,7 +150,7 @@ public class StreamController {
 
             recordVideo.setStream(stream);
             recordVideoRepository.save(recordVideo);
-            StreamResponse streamResponse = new StreamResponse(stream.getId(),stream.getStreamName(),stream.getDescription(),stream.getCategories(),stream.getStartTime(),stream.getStatus(),stream.getUser().getId());
+            StreamResponse streamResponse = new StreamResponse(stream.getId(),stream.getStreamName(),stream.getDescription(),stream.getCategories(),stream.getThumbnail(),stream.getStartTime(),stream.getStatus(),stream.getUser().getId());
 
             return ResponseEntity.ok(streamResponse);
         }
@@ -118,6 +158,7 @@ public class StreamController {
             return ResponseEntity.ok(new MessageResponse("Error"));
         }
     }
+
 
     @PostMapping("/stop")
     @PreAuthorize("hasRole('USER')")
@@ -128,7 +169,7 @@ public class StreamController {
         Optional<Stream> stream = streamRepository.findById(stopStreamRequest.getStreamId());
 
         StreamResponse streamResponse = new StreamResponse(stream.get().getId(),stream.get().getStreamName(),stream.get().getDescription(),
-                stream.get().getCategories(),stream.get().getStartTime(),stream.get().getEndTime(),stream.get().getStatus(),stream.get().getUser().getId());
+                stream.get().getCategories(),stream.get().getThumbnail(),stream.get().getStartTime(),stream.get().getEndTime(),stream.get().getStatus(),stream.get().getUser().getId());
 
         return ResponseEntity.ok(streamResponse);
     }
@@ -150,7 +191,7 @@ public class StreamController {
         List<StreamResponse> listBroadcastingStreams = new ArrayList<>();
         for (Stream stream : streamRepository.getListBroadcastingStreams()) {
             StreamResponse streamResponse = new StreamResponse(stream.getId(),stream.getStreamName(),stream.getDescription(),
-                    stream.getCategories(),stream.getStatus(),stream.getUser().getId());
+                    stream.getCategories(),stream.getThumbnail(),stream.getStartTime(),stream.getStatus(),stream.getUser().getId());
             listBroadcastingStreams.add(streamResponse);
         }
         return ResponseEntity.ok(listBroadcastingStreams);
@@ -161,7 +202,7 @@ public class StreamController {
         Stream stream = streamRepository.findStreamByUserName(username);
 
         StreamResponse streamResponse = new StreamResponse(stream.getId(),stream.getStreamName(),stream.getDescription()
-                ,stream.getCategories(),stream.getStatus(),stream.getUser().getId());
+                ,stream.getCategories(),stream.getThumbnail(),stream.getStartTime(),stream.getStatus(),stream.getUser().getId());
 
         return ResponseEntity.ok(streamResponse);
     }
@@ -171,7 +212,7 @@ public class StreamController {
         List<StreamResponse> listBroadcastingStreamsByCategory = new ArrayList<>();
         for (Stream stream : streamRepository.getListBroadcastingStreamsByCategory(category)) {
             StreamResponse streamResponse = new StreamResponse(stream.getId(),stream.getStreamName(),stream.getDescription(),
-                    stream.getCategories(),stream.getStatus(),stream.getUser().getId());
+                    stream.getCategories(),stream.getThumbnail(),stream.getStartTime(),stream.getStatus(),stream.getUser().getId());
             listBroadcastingStreamsByCategory.add(streamResponse);
         }
         return ResponseEntity.ok(listBroadcastingStreamsByCategory);
@@ -183,10 +224,12 @@ public class StreamController {
         List<StreamResponse> streamResponses = new ArrayList<>();
         for (Stream stream : streams) {
             StreamResponse streamResponse = new StreamResponse(stream.getId(),stream.getStreamName(),stream.getDescription(),
-                    stream.getCategories(),stream.getStatus(),stream.getUser().getId());
+                    stream.getCategories(),stream.getThumbnail(),stream.getStartTime(),stream.getStatus(),stream.getUser().getId());
             streamResponses.add(streamResponse);
         }
         return ResponseEntity.ok(streamResponses);
     }
+
+
 
 }

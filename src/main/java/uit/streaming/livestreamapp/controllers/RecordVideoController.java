@@ -51,4 +51,14 @@ public class RecordVideoController {
        return ResponseEntity.ok(recordVideoResponseList);
     }
 
+    @GetMapping("/record-by-streamid/{streamId}")
+    public ResponseEntity<?> getRecordByStreamId(@PathVariable Long streamId) {
+        RecordVideo recordVideo = recordVideoRepository.findRecordVideoByStreamId(streamId);
+
+        RecordVideoResponse recordVideoResponse = new RecordVideoResponse(recordVideo.getRecordUrl(),
+                recordVideo.getRecordName(),recordVideo.getStartTime(),recordVideo.getStream().getId());
+
+        return ResponseEntity.ok(recordVideoResponse);
+    }
+
 }

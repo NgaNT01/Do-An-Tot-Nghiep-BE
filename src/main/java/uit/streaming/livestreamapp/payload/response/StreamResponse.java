@@ -23,6 +23,8 @@ public class StreamResponse {
 
     private Set<Category> categories;
 
+    private String thumbnailUrl;
+
     private LocalDateTime startTime;
 
     private LocalDateTime endTime;
@@ -38,6 +40,29 @@ public class StreamResponse {
         this.streamName = streamName;
         this.description = description;
         this.categories = categories;
+        this.status = status;
+        this.userId = userId;
+    }
+
+    public StreamResponse(Long streamId, String streamName, String description, Set<Category> categories, String thumbnailUrl, LocalDateTime startTime, String status, Long userId) {
+        this.streamId = streamId;
+        this.streamName = streamName;
+        this.description = description;
+        this.categories = categories;
+        this.thumbnailUrl = thumbnailUrl;
+        this.startTime = startTime;
+        this.status = status;
+        this.userId = userId;
+    }
+
+    public StreamResponse(Long streamId, String streamName, String description, Set<Category> categories, String thumbnailUrl, LocalDateTime startTime, LocalDateTime endTime, String status, Long userId) {
+        this.streamId = streamId;
+        this.streamName = streamName;
+        this.description = description;
+        this.categories = categories;
+        this.thumbnailUrl = thumbnailUrl;
+        this.startTime = startTime;
+        this.endTime = endTime;
         this.status = status;
         this.userId = userId;
     }
