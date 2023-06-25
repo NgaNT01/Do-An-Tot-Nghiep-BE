@@ -23,6 +23,8 @@ public class RecordVideo {
 
     private LocalDateTime startTime;
 
+    private String thumbnailUrl;
+
     private LocalDateTime endTime;
 
     @OneToOne(cascade = CascadeType.ALL)
@@ -38,19 +40,27 @@ public class RecordVideo {
         this.startTime = startTime;
     }
 
-    public RecordVideo(String recordUrl, String recordName, LocalDateTime startTime, LocalDateTime endTime) {
+    public RecordVideo(String recordUrl, String recordName, LocalDateTime startTime, String thumbnailUrl) {
         this.recordUrl = recordUrl;
         this.recordName = recordName;
         this.startTime = startTime;
-        this.endTime = endTime;
+        this.thumbnailUrl = thumbnailUrl;
     }
 
-    public RecordVideo(String recordUrl, String recordName, LocalDateTime startTime, LocalDateTime endTime, Stream stream) {
-        this.recordUrl = recordUrl;
-        this.recordName = recordName;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.stream = stream;
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getThumbnailUrl() {
+        return thumbnailUrl;
+    }
+
+    public void setThumbnailUrl(String thumbnailUrl) {
+        this.thumbnailUrl = thumbnailUrl;
     }
 
     public String getRecordUrl() {

@@ -29,7 +29,7 @@ public interface StreamRepository extends JpaRepository<Stream, Long> {
     @Query(value = "UPDATE Stream s SET s.status = 'stopped', s.end_time = ?1 WHERE s.id = ?2",nativeQuery = true)
     public void updateStreamById();
 
-    @Query(value = "SELECT s FROM Stream s WHERE s.status = 'broadcasting'")
+    @Query(value = "SELECT s.* FROM Stream s WHERE s.status = 'broadcasting'",nativeQuery = true)
     public List<Stream> getListBroadcastingStreams();
 
     @Query(value = "SELECT s.* FROM STREAM s inner join users u " +

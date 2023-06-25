@@ -35,14 +35,6 @@ public class StreamResponse {
 
     private Long userId;
 
-    public StreamResponse(Long streamId, String streamName, String description, Set<Category> categories, String status, Long userId) {
-        this.streamId = streamId;
-        this.streamName = streamName;
-        this.description = description;
-        this.categories = categories;
-        this.status = status;
-        this.userId = userId;
-    }
 
     public StreamResponse(Long streamId, String streamName, String description, Set<Category> categories, String thumbnailUrl, LocalDateTime startTime, String status, Long userId) {
         this.streamId = streamId;
@@ -67,25 +59,28 @@ public class StreamResponse {
         this.userId = userId;
     }
 
-    public StreamResponse(Long streamId, String streamName, String description, Set<Category> categories, LocalDateTime startTime, String status, Long userId) {
-        this.streamId = streamId;
-        this.streamName = streamName;
-        this.description = description;
-        this.categories = categories;
-        this.startTime = startTime;
-        this.status = status;
-        this.userId = userId;
+    public String getThumbnailUrl() {
+        return thumbnailUrl;
     }
 
-    public StreamResponse(Long streamId, String streamName, String description, Set<Category> categories, LocalDateTime startTime, LocalDateTime endTime, String status, Long userId) {
-        this.streamId = streamId;
-        this.streamName = streamName;
-        this.description = description;
-        this.categories = categories;
+    public void setThumbnailUrl(String thumbnailUrl) {
+        this.thumbnailUrl = thumbnailUrl;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
         this.startTime = startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
-        this.status = status;
-        this.userId = userId;
     }
 
     public Long getStreamId() {

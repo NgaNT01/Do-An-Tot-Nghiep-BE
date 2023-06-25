@@ -146,7 +146,7 @@ public class StreamController {
             String recordUrl = "https://ngant01.sgp1.digitaloceanspaces.com/streams/" + username + "_" + stream.getId().toString() +
                     ".mp4";
 
-            RecordVideo recordVideo = new RecordVideo(recordUrl,stream.getStreamName(),startTime);
+            RecordVideo recordVideo = new RecordVideo(recordUrl,stream.getStreamName(),startTime,stream.getThumbnail());
 
             recordVideo.setStream(stream);
             recordVideoRepository.save(recordVideo);
@@ -192,19 +192,26 @@ public class StreamController {
         for (Stream stream : streamRepository.getListBroadcastingStreams()) {
             StreamResponse streamResponse = new StreamResponse(stream.getId(),stream.getStreamName(),stream.getDescription(),
                     stream.getCategories(),stream.getThumbnail(),stream.getStartTime(),stream.getStatus(),stream.getUser().getId());
+
             listBroadcastingStreams.add(streamResponse);
         }
         return ResponseEntity.ok(listBroadcastingStreams);
     }
 
     @GetMapping("/stream-by-username/{username}")
-    public ResponseEntity<StreamResponse> getStreamByUserName(@PathVariable String username) {
+    public ResponseEntity<?> getStreamByUserName(@PathVariable String username) {
         Stream stream = streamRepository.findStreamByUserName(username);
 
-        StreamResponse streamResponse = new StreamResponse(stream.getId(),stream.getStreamName(),stream.getDescription()
-                ,stream.getCategories(),stream.getThumbnail(),stream.getStartTime(),stream.getStatus(),stream.getUser().getId());
+        if (stream != null) {
+            StreamResponse streamResponse = new StreamResponse(stream.getId(),stream.getStreamName(),stream.getDescription()
+                    ,stream.getCategories(),stream.getThumbnail(),stream.getStartTime(),stream.getStatus(),stream.getUser().getId());
+            return ResponseEntity.ok(streamResponse);
+        }
+        else {
+            return ResponseEntity.ok(new MessageResponse("Streamer chưa phát trực tuyến"));
+        }
 
-        return ResponseEntity.ok(streamResponse);
+
     }
 
     @GetMapping("/stream-by-category/{category}")

@@ -10,7 +10,27 @@ public class RecordVideoResponse {
 
     public LocalDateTime startTime;
 
+    public LocalDateTime endTime;
+
+    private String thumbnailUrl;
+
     public Long streamId;
+
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
+    public String getThumbnailUrl() {
+        return thumbnailUrl;
+    }
+
+    public void setThumbnailUrl(String thumbnailUrl) {
+        this.thumbnailUrl = thumbnailUrl;
+    }
 
     public String getRecordUrl() {
         return recordUrl;
@@ -44,10 +64,12 @@ public class RecordVideoResponse {
         this.streamId = streamId;
     }
 
-    public RecordVideoResponse(String recordUrl, String recordName, LocalDateTime startTime, Long streamId) {
+    public RecordVideoResponse(String recordUrl, String recordName, LocalDateTime startTime, LocalDateTime endTime, String thumbnailUrl, Long streamId) {
         this.recordUrl = recordUrl;
         this.recordName = recordName;
         this.startTime = startTime;
+        this.endTime = endTime;
+        this.thumbnailUrl = thumbnailUrl;
         this.streamId = streamId;
     }
 }

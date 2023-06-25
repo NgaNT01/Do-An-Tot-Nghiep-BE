@@ -44,7 +44,7 @@ public class RecordVideoController {
 
        for (RecordVideo recordVideo : recordVideoList) {
            RecordVideoResponse recordVideoResponse = new RecordVideoResponse(recordVideo.getRecordUrl(),
-                   recordVideo.getRecordName(),recordVideo.getStartTime(),recordVideo.getStream().getId());
+                   recordVideo.getRecordName(),recordVideo.getStartTime(),recordVideo.getEndTime(), recordVideo.getThumbnailUrl(), recordVideo.getStream().getId());
            recordVideoResponseList.add(recordVideoResponse);
        }
 
@@ -56,7 +56,7 @@ public class RecordVideoController {
         RecordVideo recordVideo = recordVideoRepository.findRecordVideoByStreamId(streamId);
 
         RecordVideoResponse recordVideoResponse = new RecordVideoResponse(recordVideo.getRecordUrl(),
-                recordVideo.getRecordName(),recordVideo.getStartTime(),recordVideo.getStream().getId());
+                recordVideo.getRecordName(),recordVideo.getStartTime(),recordVideo.getEndTime(), recordVideo.getThumbnailUrl(), recordVideo.getStream().getId());
 
         return ResponseEntity.ok(recordVideoResponse);
     }

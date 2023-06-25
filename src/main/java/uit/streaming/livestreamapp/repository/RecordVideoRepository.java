@@ -21,7 +21,7 @@ public interface RecordVideoRepository extends JpaRepository<RecordVideo,Long> {
 
     @Query(value = "SELECT rc.* FROM STREAM s inner join category_stream cs on s.id = cs.stream_id " +
             "inner join categories c on c.id = cs.category_id inner join record_video rc on rc.stream_id = s.id " +
-            "where c.name = ?1", nativeQuery = true)
+            "where c.name = ?1 and rc.end_time is not null", nativeQuery = true)
     public List<RecordVideo> getListRecordVideoByCategory(String category);
 
 }

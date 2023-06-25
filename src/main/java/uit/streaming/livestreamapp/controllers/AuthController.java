@@ -1,9 +1,6 @@
 package uit.streaming.livestreamapp.controllers;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
@@ -180,5 +177,17 @@ public class AuthController {
                 user.getAvatarUrl(),user.getLive(),user.getRoles(),user.getStreams());
 
         return ResponseEntity.ok(userProfileResponse);
+    }
+
+    @GetMapping("/all-user-by-name/{username}")
+    public ResponseEntity<?> getAllUserByName(@PathVariable String username) {
+        List<User> userList= userRepository.findAllByUsername(username);
+        List<UserProfileResponse> userProfileResponseList = new ArrayList<>();
+        for (User user : userList) {
+            UserProfileResponse userProfileResponse = new UserProfileResponse(user.getId(),user.getUsername(),user.getEmail(),
+                    user.getAvatarUrl(),user.getLive(),user.getRoles(),user.getStreams());
+            userProfileResponseList.add(userProfileResponse);
+        }
+        return ResponseEntity.ok(userProfileResponseList);
     }
 }
