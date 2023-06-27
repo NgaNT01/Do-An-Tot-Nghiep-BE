@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import uit.streaming.livestreamapp.entity.RecordVideo;
+import uit.streaming.livestreamapp.entity.User;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,5 +24,8 @@ public interface RecordVideoRepository extends JpaRepository<RecordVideo,Long> {
             "inner join categories c on c.id = cs.category_id inner join record_video rc on rc.stream_id = s.id " +
             "where c.name = ?1 and rc.end_time is not null", nativeQuery = true)
     public List<RecordVideo> getListRecordVideoByCategory(String category);
+
+    @Query(value = "SELECT * FROM record_video rc WHERE rc.record_name LIKE concat('%', ?1, '%')",nativeQuery = true)
+    List<RecordVideo> findAllByRecordName(String recordName);
 
 }

@@ -61,4 +61,19 @@ public class RecordVideoController {
         return ResponseEntity.ok(recordVideoResponse);
     }
 
+    @GetMapping("/all-record-by-name/{recordName}")
+    public ResponseEntity<?> getRecordByStreamId(@PathVariable String recordName) {
+        List<RecordVideo> recordVideoList = recordVideoRepository.findAllByRecordName(recordName);
+
+        List<RecordVideoResponse> recordVideoResponses = new ArrayList<>();
+
+        for (RecordVideo recordVideo : recordVideoList) {
+            RecordVideoResponse recordVideoResponse = new RecordVideoResponse(recordVideo.getRecordUrl(),
+                    recordVideo.getRecordName(),recordVideo.getStartTime(),recordVideo.getEndTime(), recordVideo.getThumbnailUrl(), recordVideo.getStream().getId());
+            recordVideoResponses.add(recordVideoResponse);
+        }
+
+        return ResponseEntity.ok(recordVideoResponses);
+    }
+
 }

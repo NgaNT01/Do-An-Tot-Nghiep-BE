@@ -11,6 +11,7 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,6 +29,7 @@ import uit.streaming.livestreamapp.payload.request.StopStreamRequest;
 import uit.streaming.livestreamapp.payload.response.MessageResponse;
 import uit.streaming.livestreamapp.payload.response.StatisticResponse;
 import uit.streaming.livestreamapp.payload.response.StreamResponse;
+import uit.streaming.livestreamapp.payload.response.UserProfileResponse;
 import uit.streaming.livestreamapp.repository.*;
 import uit.streaming.livestreamapp.security.jwt.JwtUtils;
 import uit.streaming.livestreamapp.services.StreamService;
@@ -76,6 +78,12 @@ public class StreamController {
     @Autowired
     AmazonS3 amazonS3;
 
+    @Value("${aws.access.key}")
+    private String accessKey;
+
+    @Value("${aws.secret.key}")
+    private String secretKey;
+
 
     @PostMapping("/start")
     @PreAuthorize("hasRole('USER')")
@@ -85,8 +93,8 @@ public class StreamController {
         User user = userRepository.findByUsername(username);
 
         AWSCredentials credentials = new BasicAWSCredentials(
-                "DO008KGCFHTVD8L9HY42",
-                "hxmW4xJ8ZW37xPyTh8oloawj7q7dtGU7bD+nMiCiR8g"
+                accessKey,
+                secretKey
         );
 
         AmazonS3 s3client = AmazonS3ClientBuilder
@@ -237,6 +245,16 @@ public class StreamController {
         return ResponseEntity.ok(streamResponses);
     }
 
-
+    @GetMapping("/all-stream-by-name/{streamName}")
+    public ResponseEntity<?> getAllStreamByName(@PathVariable String streamName) {
+        List<Stream> streamList= streamRepository.getAllStreamByStreamName(streamName);
+        List<StreamResponse> streamResponseList = new ArrayList<>();
+        for (Stream stream : streamList) {
+            StreamResponse streamResponse = new StreamResponse(stream.getId(),stream.getStreamName(),stream.getDescription(),
+                    stream.getCategories(),stream.getThumbnail(),stream.getStartTime(),stream.getStatus(),stream.getUser().getId());
+            streamResponseList.add(streamResponse);
+        }
+        return ResponseEntity.ok(streamResponseList);
+    }
 
 }

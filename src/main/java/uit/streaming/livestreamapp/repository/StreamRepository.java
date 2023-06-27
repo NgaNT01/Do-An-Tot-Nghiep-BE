@@ -42,4 +42,7 @@ public interface StreamRepository extends JpaRepository<Stream, Long> {
     @Query(value = "SELECT * FROM stream",nativeQuery = true)
     public List<Stream> getListStream();
 
+    @Query(value = "SELECT * FROM stream s WHERE s.stream_name LIKE concat('%', ?1, '%') and s.status = 'broadcasting'",nativeQuery = true)
+    public List<Stream> getAllStreamByStreamName(String streamName);
+
 }
