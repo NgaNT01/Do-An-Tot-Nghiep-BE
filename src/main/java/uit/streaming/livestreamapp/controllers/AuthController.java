@@ -1,28 +1,39 @@
 package uit.streaming.livestreamapp.controllers;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import uit.streaming.livestreamapp.entity.ERole;
 import uit.streaming.livestreamapp.entity.Role;
 import uit.streaming.livestreamapp.entity.User;
+import uit.streaming.livestreamapp.payload.request.ChangeAvatarRequest;
 import uit.streaming.livestreamapp.payload.request.LoginRequest;
 import uit.streaming.livestreamapp.payload.request.SignupRequest;
 import uit.streaming.livestreamapp.payload.response.JwtResponse;
@@ -53,7 +64,13 @@ public class AuthController {
     JwtUtils jwtUtils;
 
     @Autowired
-    private AmazonS3 amazonS3;
+    AmazonS3 amazonS3;
+
+    @Value("${aws.access.key}")
+    private String accessKey;
+
+    @Value("${aws.secret.key}")
+    private String secretKey;
 
     @PostMapping("/sign-in")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -136,27 +153,38 @@ public class AuthController {
     }
 
     @PostMapping("/upload-avatar")
-    public ResponseEntity<String> uploadAvatar(@RequestParam("file") MultipartFile file,
-                                               @RequestParam("userId") Long userId) throws IOException {
-        String fileName = file.getOriginalFilename();
+    @PreAuthorize("hasRole('USER')")
+    @Transactional
+    public ResponseEntity<?> uploadAvatar(@RequestBody ChangeAvatarRequest changeAvatarRequest) throws IOException {
+        AWSCredentials credentials = new BasicAWSCredentials(
+                accessKey,
+                secretKey
+        );
 
-        ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentType(file.getContentType());
-        metadata.setContentLength(file.getSize());
+        AmazonS3 s3client = AmazonS3ClientBuilder
+                .standard()
+                .withCredentials(new AWSStaticCredentialsProvider(credentials))
+                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration("sgp1.digitaloceanspaces.com", "sgp1"))
+                .build();
 
-        String key = "avatar/" + userId + "/" + fileName;
+        byte[] byteAvatarImage = Base64.getDecoder().decode(changeAvatarRequest.getStringAvatar());
+        InputStream is = new ByteArrayInputStream(byteAvatarImage);
+        ObjectMetadata om = new ObjectMetadata();
+        om.setContentLength(byteAvatarImage.length);
+        om.setContentType("image/jpg");
 
-        PutObjectRequest putObjectRequest = new PutObjectRequest("ngant01", key, file.getInputStream(), metadata)
-                .withCannedAcl(CannedAccessControlList.PublicReadWrite);
+        String filepath = "user_profile/" + changeAvatarRequest.getAvatarFileName();
+        s3client.putObject(
+                new PutObjectRequest("ngant01", filepath, is, om)
+                        .withCannedAcl(CannedAccessControlList.PublicReadWrite));
 
-        amazonS3.putObject(putObjectRequest);
+        userRepository.setUserAvatarUrl(s3client.getUrl("ngant01",filepath).toString(), changeAvatarRequest.getUserId());
 
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-        user.setAvatarUrl("https://ngant01.sgp1.digitaloceanspaces.com/" + key);
+        Optional<User> user = userRepository.findById(changeAvatarRequest.getUserId());
 
-        userRepository.save(user);
-
-        return ResponseEntity.ok("Upload avatar successfully");
+        UserProfileResponse userProfileResponse = new UserProfileResponse(user.get().getId(),user.get().getUsername(),user.get().getEmail(),
+                user.get().getAvatarUrl(),user.get().getLive(),user.get().getRoles(),user.get().getStreams());
+        return ResponseEntity.ok(userProfileResponse);
     }
 
     @GetMapping("/user-profile/{userId}")

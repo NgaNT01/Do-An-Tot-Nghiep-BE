@@ -7,6 +7,7 @@ import uit.streaming.livestreamapp.entity.User;
 import uit.streaming.livestreamapp.repository.FollowRepository;
 import uit.streaming.livestreamapp.repository.UserRepository;
 
+import javax.transaction.Transactional;
 import java.util.Optional;
 
 @Service
@@ -35,6 +36,7 @@ public class FollowService {
         }
     }
 
+    @Transactional
     public void unfollowUser(Long followerId, Long followingId) {
         followRepository.deleteByFollowerIdAndFollowingId(followerId, followingId);
     }

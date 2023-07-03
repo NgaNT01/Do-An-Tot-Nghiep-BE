@@ -8,6 +8,8 @@ import uit.streaming.livestreamapp.repository.RecordVideoRepository;
 import uit.streaming.livestreamapp.repository.StreamRepository;
 
 import javax.transaction.Transactional;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;

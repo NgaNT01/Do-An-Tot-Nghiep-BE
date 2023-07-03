@@ -25,7 +25,10 @@ public interface RecordVideoRepository extends JpaRepository<RecordVideo,Long> {
             "where c.name = ?1 and rc.end_time is not null", nativeQuery = true)
     public List<RecordVideo> getListRecordVideoByCategory(String category);
 
-    @Query(value = "SELECT * FROM record_video rc WHERE rc.record_name LIKE concat('%', ?1, '%')",nativeQuery = true)
+    @Query(value = "SELECT * FROM record_video rc WHERE rc.record_name LIKE concat('%', ?1, '%') and rc.end_time is not null",nativeQuery = true)
     List<RecordVideo> findAllByRecordName(String recordName);
+
+    @Query(value = "SELECT * FROM record_video rc inner join stream s on rc.stream_id = s.id inner join users u on u.id = s.user_id where u.id = ?1",nativeQuery = true)
+    List<RecordVideo> findAllByUserId(Long userId);
 
 }

@@ -1,5 +1,6 @@
 package uit.streaming.livestreamapp.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import uit.streaming.livestreamapp.entity.User;
@@ -23,4 +24,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query(value = "SELECT * FROM users u WHERE u.username LIKE concat('%', ?1, '%')",nativeQuery = true)
     List<User> findAllByUsername(String username);
+
+    @Modifying
+    @Query(value = "UPDATE USERS u SET u.avatar_url = ?1 where u.id = ?2",nativeQuery = true)
+    public void setUserAvatarUrl(String avatarUrl, Long userId);
 }
