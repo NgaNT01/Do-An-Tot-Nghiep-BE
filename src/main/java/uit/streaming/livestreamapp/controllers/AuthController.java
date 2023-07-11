@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import uit.streaming.livestreamapp.entity.ERole;
+import uit.streaming.livestreamapp.entity.Follow;
 import uit.streaming.livestreamapp.entity.Role;
 import uit.streaming.livestreamapp.entity.User;
 import uit.streaming.livestreamapp.payload.request.ChangeAvatarRequest;
@@ -39,6 +40,7 @@ import uit.streaming.livestreamapp.payload.request.SignupRequest;
 import uit.streaming.livestreamapp.payload.response.JwtResponse;
 import uit.streaming.livestreamapp.payload.response.MessageResponse;
 import uit.streaming.livestreamapp.payload.response.UserProfileResponse;
+import uit.streaming.livestreamapp.repository.FollowRepository;
 import uit.streaming.livestreamapp.repository.RoleRepository;
 import uit.streaming.livestreamapp.repository.UserRepository;
 import uit.streaming.livestreamapp.security.jwt.JwtUtils;
@@ -56,6 +58,9 @@ public class AuthController {
 
     @Autowired
     RoleRepository roleRepository;
+
+    @Autowired
+    FollowRepository followRepository;
 
     @Autowired
     PasswordEncoder encoder;
@@ -182,8 +187,10 @@ public class AuthController {
 
         Optional<User> user = userRepository.findById(changeAvatarRequest.getUserId());
 
+        List<Follow> followList = followRepository.getListFollowerByFollowing(user.get().getId());
+
         UserProfileResponse userProfileResponse = new UserProfileResponse(user.get().getId(),user.get().getUsername(),user.get().getEmail(),
-                user.get().getAvatarUrl(),user.get().getLive(),user.get().getRoles(),user.get().getStreams());
+                user.get().getAvatarUrl(),user.get().getLive(),followList.size(),user.get().getRoles(),user.get().getStreams());
         return ResponseEntity.ok(userProfileResponse);
     }
 
@@ -191,8 +198,10 @@ public class AuthController {
     public ResponseEntity<UserProfileResponse> getUserProfileById(@PathVariable Long userId) {
         Optional<User> user = userRepository.findById(userId);
 
+        List<Follow> followList = followRepository.getListFollowerByFollowing(user.get().getId());
+
         UserProfileResponse userProfileResponse = new UserProfileResponse(user.get().getId(),user.get().getUsername(),user.get().getEmail(),
-                user.get().getAvatarUrl(),user.get().getLive(),user.get().getRoles(),user.get().getStreams());
+                user.get().getAvatarUrl(),user.get().getLive(),followList.size(),user.get().getRoles(),user.get().getStreams());
 
         return ResponseEntity.ok(userProfileResponse);
     }
@@ -201,8 +210,10 @@ public class AuthController {
     public ResponseEntity<UserProfileResponse> getUserProfileByName(@PathVariable String username) {
         User user = userRepository.findByUsername(username);
 
+        List<Follow> followList = followRepository.getListFollowerByFollowing(user.getId());
+
         UserProfileResponse userProfileResponse = new UserProfileResponse(user.getId(),user.getUsername(),user.getEmail(),
-                user.getAvatarUrl(),user.getLive(),user.getRoles(),user.getStreams());
+                user.getAvatarUrl(),user.getLive(),followList.size(),user.getRoles(),user.getStreams());
 
         return ResponseEntity.ok(userProfileResponse);
     }
@@ -212,8 +223,9 @@ public class AuthController {
         List<User> userList= userRepository.findAllByUsername(username);
         List<UserProfileResponse> userProfileResponseList = new ArrayList<>();
         for (User user : userList) {
+            List<Follow> followList = followRepository.getListFollowerByFollowing(user.getId());
             UserProfileResponse userProfileResponse = new UserProfileResponse(user.getId(),user.getUsername(),user.getEmail(),
-                    user.getAvatarUrl(),user.getLive(),user.getRoles(),user.getStreams());
+                    user.getAvatarUrl(),user.getLive(),followList.size(),user.getRoles(),user.getStreams());
             userProfileResponseList.add(userProfileResponse);
         }
         return ResponseEntity.ok(userProfileResponseList);

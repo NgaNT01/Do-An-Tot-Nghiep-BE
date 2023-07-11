@@ -7,7 +7,10 @@ import java.util.Set;
 public class GetStatisticRequest {
 
     @NotBlank
-    private int month;
+    private int startMonth;
+
+    @NotBlank
+    private int endMonth;
 
     @NotBlank
     private int year;
@@ -15,12 +18,20 @@ public class GetStatisticRequest {
     @NotBlank
     private Long userId;
 
-    public int getMonth() {
-        return month;
+    public int getStartMonth() {
+        return startMonth;
     }
 
-    public void setMonth(int month) {
-        this.month = month;
+    public void setStartMonth(int startMonth) {
+        this.startMonth = startMonth;
+    }
+
+    public int getEndMonth() {
+        return endMonth;
+    }
+
+    public void setEndMonth(int endMonth) {
+        this.endMonth = endMonth;
     }
 
     public int getYear() {

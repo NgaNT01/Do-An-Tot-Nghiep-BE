@@ -8,6 +8,8 @@ import uit.streaming.livestreamapp.repository.FollowRepository;
 import uit.streaming.livestreamapp.repository.UserRepository;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -21,6 +23,7 @@ public class FollowService {
     public void followUser(Long followerId, Long followingId) {
         // Kiểm tra xem đã tồn tại mối quan hệ theo dõi hay chưa
         if (!followRepository.existsByFollowerIdAndFollowingId(followerId, followingId)) {
+            LocalDateTime followDate = LocalDateTime.now();
 
             // Lấy thông tin người theo dõi
             Optional<User> follower = userRepository.findById(followerId);
@@ -30,7 +33,7 @@ public class FollowService {
             Optional<User> following = userRepository.findById(followingId);
             User followingEntity = following.get();
 
-            Follow follow = new Follow(followerEntity,followingEntity);
+            Follow follow = new Follow(followerEntity,followingEntity,followDate);
 
             followRepository.save(follow);
         }
@@ -39,6 +42,13 @@ public class FollowService {
     @Transactional
     public void unfollowUser(Long followerId, Long followingId) {
         followRepository.deleteByFollowerIdAndFollowingId(followerId, followingId);
+    }
+
+    public int calculateTotalFollower(int startMonth, int endMonth, Long followingId) {
+        List<Follow> followerList = followRepository.getListFollowerByMonth(startMonth, endMonth, followingId);
+        int totalFollowers = followerList.size();
+
+        return totalFollowers;
     }
 
 }

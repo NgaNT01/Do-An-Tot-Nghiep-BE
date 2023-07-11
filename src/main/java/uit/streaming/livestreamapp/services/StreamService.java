@@ -1,5 +1,6 @@
 package uit.streaming.livestreamapp.services;
 
+import com.amazonaws.services.kms.model.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uit.streaming.livestreamapp.entity.Stream;
@@ -37,8 +38,8 @@ public class StreamService {
         return streams;
     }
 
-    public int calculateTotalViewsByMonthAndYearandUserId(int month, int year, Long userId) {
-        List<Stream> streams = streamRepository.findByMonthAndYearAndUserId(month, year,userId);
+    public int calculateTotalViewsByMonthAndYearAndUserId(int startMonth,int endMonth, int year, Long userId) {
+        List<Stream> streams = streamRepository.findByMonthAndYearAndUserId(startMonth,endMonth, year,userId);
 
         int totalViews = 0;
         for (Stream stream : streams) {
@@ -48,8 +49,8 @@ public class StreamService {
         return totalViews;
     }
 
-    public Duration calculateTotalDurationByMonthAndYearAndUserId(int month, int year, Long userId) {
-        List<Stream> streams = streamRepository.findByMonthAndYearAndUserId(month, year, userId);
+    public Duration calculateTotalDurationByMonthAndYearAndUserId(int startMonth,int endMonth, int year, Long userId) {
+        List<Stream> streams = streamRepository.findByMonthAndYearAndUserId(startMonth,endMonth, year, userId);
 
         Duration totalDuration = Duration.ZERO;
         for (Stream stream : streams) {
@@ -61,6 +62,22 @@ public class StreamService {
         System.out.println("total" + totalDuration);
 
         return totalDuration;
+    }
+
+    @Transactional
+    public void playStream(Long streamId) {
+        Optional<Stream> optionalStream = streamRepository.findById(streamId);
+        if (optionalStream.isPresent()) {
+            Stream stream = optionalStream.get();
+
+            int prevViewerCount = stream.getViewerCount();
+            int nViewerCount = prevViewerCount + 1;
+            stream.setViewerCount(nViewerCount);
+
+            streamRepository.save(stream);
+        } else {
+            throw new NotFoundException("Stream not found with id: " + streamId);
+        }
     }
 
 }

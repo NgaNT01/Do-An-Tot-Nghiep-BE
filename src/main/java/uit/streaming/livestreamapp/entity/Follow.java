@@ -1,6 +1,7 @@
 package uit.streaming.livestreamapp.entity;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "follow")
@@ -18,9 +19,12 @@ public class Follow {
     @JoinColumn(name = "following_id", referencedColumnName = "id")
     private User following;
 
-    public Follow(User follower, User following) {
+    private LocalDateTime followDate;
+
+    public Follow(User follower, User following, LocalDateTime followDate) {
         this.follower = follower;
         this.following = following;
+        this.followDate = followDate;
     }
 
     public Follow() {

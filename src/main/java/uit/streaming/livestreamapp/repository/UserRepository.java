@@ -28,4 +28,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Modifying
     @Query(value = "UPDATE USERS u SET u.avatar_url = ?1 where u.id = ?2",nativeQuery = true)
     public void setUserAvatarUrl(String avatarUrl, Long userId);
+
+
 }

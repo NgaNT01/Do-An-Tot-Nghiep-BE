@@ -17,9 +17,9 @@ public interface StreamRepository extends JpaRepository<Stream, Long> {
 
     Stream findStreamByStreamName(String streamName);
 
-    @Query(value = "SELECT s.* FROM stream s WHERE MONTH(s.start_time) = ?1 AND YEAR(s.start_time) = ?2 AND s.user_id = ?3 AND s.status = 'stopped'",
+    @Query(value = "SELECT s.* FROM stream s WHERE MONTH(s.start_time) BETWEEN ?1 AND ?2 AND YEAR(s.start_time) = ?3 AND s.user_id = ?4 AND s.status = 'stopped'",
             nativeQuery = true)
-    List<Stream> findByMonthAndYearAndUserId(int month, int year, Long userId);
+    List<Stream> findByMonthAndYearAndUserId(int startMonth,int endMonth, int year, Long userId);
 
     @Modifying
     @Query(value = "UPDATE Stream s SET s.status = 'stopped', s.end_time = ?1 WHERE s.id = ?2",nativeQuery = true)
@@ -44,5 +44,9 @@ public interface StreamRepository extends JpaRepository<Stream, Long> {
 
     @Query(value = "SELECT * FROM stream s WHERE s.stream_name LIKE concat('%', ?1, '%') and s.status = 'broadcasting'",nativeQuery = true)
     public List<Stream> getAllStreamByStreamName(String streamName);
+
+    @Modifying
+    @Query(value = "UPDATE Stream s SET s.viewer_count = ?1 where s.id = ?2",nativeQuery = true)
+    public void updateViewerCountById(int viewerCount, Long streamId);
 
 }

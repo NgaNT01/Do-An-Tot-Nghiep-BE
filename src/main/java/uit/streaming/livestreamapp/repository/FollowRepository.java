@@ -20,4 +20,10 @@ public interface FollowRepository extends JpaRepository<Follow,Long> {
     @Query(value = "SELECT * FROM Follow f where f.follower_id = ?1", nativeQuery = true)
     public List<Follow> getListFollowingByFollower(Long followerId);
 
+    @Query(value = "SELECT f.* FROM Follow f where MONTH(f.follow_date) BETWEEN ?1 AND ?2 AND f.following_id = ?3",nativeQuery = true)
+    public List<Follow> getListFollowerByMonth(int startMonth, int endMonth, Long followingId);
+
+    @Query(value = "SELECT * FROM Follow f where f.following_id = ?1",nativeQuery = true)
+    public List<Follow> getListFollowerByFollowing(Long followingId);
+
 }

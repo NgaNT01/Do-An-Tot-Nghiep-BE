@@ -66,9 +66,10 @@ public class FollowController {
         List<UserProfileResponse> userProfileResponseList = new ArrayList<>();
         for (Follow follow : followList) {
             Optional<User> followingUser = userRepository.findById(follow.getFollowing().getId());
+            List<Follow> followerList = followRepository.getListFollowerByFollowing(followingUser.get().getId());
             UserProfileResponse userProfileResponse = new UserProfileResponse(followingUser.get().getId(),
                     followingUser.get().getUsername(),followingUser.get().getEmail(),followingUser.get().getAvatarUrl(),
-                    followingUser.get().getLive(),followingUser.get().getRoles(),followingUser.get().getStreams());
+                    followingUser.get().getLive(),followerList.size(),followingUser.get().getRoles(),followingUser.get().getStreams());
             userProfileResponseList.add(userProfileResponse);
         }
         return ResponseEntity.ok(userProfileResponseList);

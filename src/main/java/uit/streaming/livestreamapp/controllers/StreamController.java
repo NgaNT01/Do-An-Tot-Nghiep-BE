@@ -32,6 +32,7 @@ import uit.streaming.livestreamapp.payload.response.StreamResponse;
 import uit.streaming.livestreamapp.payload.response.UserProfileResponse;
 import uit.streaming.livestreamapp.repository.*;
 import uit.streaming.livestreamapp.security.jwt.JwtUtils;
+import uit.streaming.livestreamapp.services.FollowService;
 import uit.streaming.livestreamapp.services.StreamService;
 import uit.streaming.livestreamapp.services.UserDetailsImpl;
 import uit.streaming.livestreamapp.services.UserDetailsServiceImpl;
@@ -74,6 +75,9 @@ public class StreamController {
 
     @Autowired
     StreamService streamService;
+
+    @Autowired
+    FollowService followService;
 
     @Autowired
     AmazonS3 amazonS3;
@@ -167,6 +171,12 @@ public class StreamController {
         }
     }
 
+    @PostMapping("/play-stream/{streamId}")
+    public ResponseEntity<?> playStream(@PathVariable Long streamId) {
+        streamService.playStream(streamId);
+        return ResponseEntity.ok(new MessageResponse("Success"));
+    }
+
 
     @PostMapping("/stop")
     @PreAuthorize("hasRole('USER')")
@@ -185,10 +195,16 @@ public class StreamController {
     @PostMapping("/statistic")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> getStatisticInfo(@RequestBody GetStatisticRequest getStatisticRequest) {
-        int totalViews = streamService.calculateTotalViewsByMonthAndYearandUserId(getStatisticRequest.getMonth(), getStatisticRequest.getYear(), getStatisticRequest.getUserId());
-        Long totalDurations = streamService.calculateTotalDurationByMonthAndYearAndUserId(getStatisticRequest.getMonth(), getStatisticRequest.getYear(), getStatisticRequest.getUserId()).toSeconds();
+        int totalViews = streamService.calculateTotalViewsByMonthAndYearAndUserId(getStatisticRequest.getStartMonth(),
+                getStatisticRequest.getEndMonth(), getStatisticRequest.getYear(), getStatisticRequest.getUserId());
 
-        StatisticResponse statisticResponse = new StatisticResponse(totalViews,totalDurations);
+        Long totalDurations = streamService.calculateTotalDurationByMonthAndYearAndUserId(getStatisticRequest.getStartMonth(),
+                getStatisticRequest.getEndMonth(), getStatisticRequest.getYear(), getStatisticRequest.getUserId()).toSeconds();
+
+        int totalFollowers = followService.calculateTotalFollower(getStatisticRequest.getStartMonth(),
+                getStatisticRequest.getEndMonth(), getStatisticRequest.getUserId());
+
+        StatisticResponse statisticResponse = new StatisticResponse(totalViews,totalDurations,totalFollowers);
 
         return ResponseEntity.ok(statisticResponse);
     }

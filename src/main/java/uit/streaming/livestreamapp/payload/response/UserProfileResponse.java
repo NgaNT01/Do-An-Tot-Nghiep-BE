@@ -30,17 +30,28 @@ public class UserProfileResponse {
 
     private Set<Role> roles;
 
+    private int followerCount;
+
     @JsonIgnore
     private Set<Stream> streams;
 
-    public UserProfileResponse(Long userId, String username, String email, String avatarUrl, Boolean isLive, Set<Role> roles, Set<Stream> streams) {
+    public UserProfileResponse(Long userId, String username, String email, String avatarUrl, Boolean isLive,int followerCount, Set<Role> roles, Set<Stream> streams) {
         this.userId = userId;
         this.username = username;
         this.email = email;
         this.avatarUrl = avatarUrl;
         this.isLive = isLive;
+        this.followerCount = followerCount;
         this.roles = roles;
         this.streams = streams;
+    }
+
+    public int getFollowerCount() {
+        return followerCount;
+    }
+
+    public void setFollowerCount(int followerCount) {
+        this.followerCount = followerCount;
     }
 
     public Long getUserId() {
